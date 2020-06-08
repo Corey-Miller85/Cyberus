@@ -5,17 +5,38 @@ import Pagination from "./pagination";
 class EntriesTable extends Component {
 	state = {
 		entries: getEntries(),
-		pageSize: 5,
+		pageSize: 4,
 		currentPage: 1,
+		paginatedEntries: [],
 	};
 
 	handlePaginationClick = (page) => {
-		const number = this.state.entries.length - this.state.pageSize * page;
-		console.log(number);
+		this.setState({
+			currentPage: page,
+		});
+		this.handlePagination();
 	};
+
+	handlePagination = () => {
+		const offsetStart = (this.state.currentPage - 1) * this.state.pageSize;
+		const offsetEnd = offsetStart + this.state.pageSize;
+		const array = [];
+		this.state.entries.forEach((entry, index) => {
+			if (index >= offsetStart && index < offsetEnd) {
+				array.push(entry);
+			}
+		});
+		return array;
+	};
+
+	componentDidMount() {
+		this.handlePagination();
+	}
 
 	render() {
 		const { length: count } = this.state.entries;
+
+		const newArr = this.handlePagination();
 		return (
 			<div>
 				<table className='table'>
@@ -27,7 +48,7 @@ class EntriesTable extends Component {
 						</tr>
 					</thead>
 					<tbody>
-						{this.state.entries.map((entry, index) => {
+						{newArr.map((entry, index) => {
 							return (
 								<tr key={index}>
 									<td>{entry.time}</td>
